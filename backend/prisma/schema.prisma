@@ -1,0 +1,459 @@
+// Prisma Schema for School Student Record Management System (SRM)
+// Database: MySQL (Portable to PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------
+// 1. AUTHENTICATION & AUTHORIZATION
+// ----------------------------------------------------
+
+model User {
+  id            Int              @id @default(autoincrement())
+  username      String           @unique @db.VarChar(50)
+  email         String           @unique @db.VarChar(100)
+  password_hash String           @db.VarChar(255)
+  role_id       Int
+  is_active     Boolean          @default(true)
+  last_login    DateTime?
+  created_at    DateTime         @default(now())
+  updated_at    DateTime         @updatedAt
+
+  role                Role             @relation(fields: [role_id], references: [id])
+  staff_profile       Staff?
+  user_permissions    UserPermission[] @relation("UserPerms")
+  granted_permissions UserPermission[] @relation("GrantedBy")
+  marks_entered       Mark[]           @relation("MarksEnteredBy")
+  payments_received   FeePayment[]     @relation("PaymentsReceivedBy")
+  audit_logs          AuditLog[]
+
+  @@map("users")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?  @db.VarChar(255)
+  users       User[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id               Int              @id @default(autoincrement())
+  name             String           @unique @db.VarChar(100)
+  module           String           @db.VarChar(50)
+  description      String?          @db.VarChar(255)
+  user_permissions UserPermission[]
+
+  @@map("permissions")
+}
+
+model UserPermission {
+  id            Int        @id @default(autoincrement())
+  user_id       Int
+  permission_id Int
+  granted_by    Int?
+  created_at    DateTime   @default(now())
+
+  user       User       @relation("UserPerms", fields: [user_id], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+  granter    User?      @relation("GrantedBy", fields: [granted_by], references: [id], onDelete: SetNull)
+
+  @@unique([user_id, permission_id])
+  @@map("user_permissions")
+}
+
+// ----------------------------------------------------
+// 2. STAFF
+// ----------------------------------------------------
+
+model Staff {
+  id            Int       @id @default(autoincrement())
+  user_id       Int       @unique
+  employee_code String    @unique @db.VarChar(30)
+  first_name    String    @db.VarChar(60)
+  last_name     String    @db.VarChar(60)
+  gender        String    @db.VarChar(20)
+  date_of_birth DateTime? @db.Date
+  phone         String    @db.VarChar(25)
+  email         String    @db.VarChar(100)
+  address       String?   @db.Text
+  joining_date  DateTime  @db.Date
+  designation   String    @db.VarChar(100)
+  degree        String    @db.VarChar(100)
+  qualification String    @db.VarChar(100)
+  department    String?   @db.VarChar(100)
+  is_active     Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  user                     User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  class_assignments        ClassStaff[]
+  teaching_subjects        StaffSubject[]
+  classes_as_class_teacher Class[]
+
+  @@map("staff")
+}
+
+// ----------------------------------------------------
+// 3. ACADEMIC STRUCTURE
+// ----------------------------------------------------
+
+model AcademicYear {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique @db.VarChar(30)
+  start_date DateTime @db.Date
+  end_date   DateTime @db.Date
+  is_current Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  classes             Class[]
+  student_enrollments StudentEnrollment[]
+  exams               Exam[]
+
+  @@map("academic_years")
+}
+
+model Standard {
+  id            Int      @id @default(autoincrement())
+  name          String   @unique @db.VarChar(30)
+  display_order Int      @default(0)
+
+  classes           Class[]
+  standard_subjects StandardSubject[]
+
+  @@map("standards")
+}
+
+model Division {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique @db.VarChar(10)
+  classes Class[]
+
+  @@map("divisions")
+}
+
+model Class {
+  id               Int      @id @default(autoincrement())
+  academic_year_id Int
+  standard_id      Int
+  division_id      Int
+  class_name       String   @db.VarChar(50)
+  class_teacher_id Int?
+  room_number      String?  @db.VarChar(30)
+  is_active        Boolean  @default(true)
+
+  academic_year    AcademicYear        @relation(fields: [academic_year_id], references: [id], onDelete: Cascade)
+  standard         Standard            @relation(fields: [standard_id], references: [id], onDelete: Cascade)
+  division         Division            @relation(fields: [division_id], references: [id], onDelete: Cascade)
+  class_teacher    Staff?              @relation(fields: [class_teacher_id], references: [id], onDelete: SetNull)
+  enrollments      StudentEnrollment[]
+  staff_assignments ClassStaff[]
+
+  @@unique([academic_year_id, standard_id, division_id])
+  @@map("classes")
+}
+
+// ----------------------------------------------------
+// 4. STUDENTS & PARENTS
+// ----------------------------------------------------
+
+model Student {
+  id               Int       @id @default(autoincrement())
+  admission_number String    @unique @db.VarChar(50)
+  first_name       String    @db.VarChar(60)
+  middle_name      String?   @db.VarChar(60)
+  last_name        String    @db.VarChar(60)
+  gender           String    @db.VarChar(20)
+  date_of_birth    DateTime  @db.Date
+  blood_group      String?   @db.VarChar(10)
+  photo_url        String?   @db.VarChar(255)
+  address          String?   @db.Text
+  city             String?   @db.VarChar(60)
+  state            String?   @db.VarChar(60)
+  pincode          String?   @db.VarChar(20)
+  admission_date   DateTime  @db.Date
+  status           String    @default("ACTIVE") @db.VarChar(20)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  parents       StudentParent[]
+  enrollments   StudentEnrollment[]
+  notifications Notification[]
+
+  @@index([admission_number])
+  @@index([status])
+  @@map("students")
+}
+
+model Parent {
+  id              Int      @id @default(autoincrement())
+  first_name      String   @db.VarChar(60)
+  last_name       String   @db.VarChar(60)
+  relationship    String   @db.VarChar(40)
+  phone           String   @db.VarChar(25)
+  whatsapp_number String?  @db.VarChar(25)
+  email           String?  @db.VarChar(100)
+  occupation      String?  @db.VarChar(100)
+  address         String?  @db.Text
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  students      StudentParent[]
+  notifications Notification[]
+
+  @@map("parents")
+}
+
+model StudentParent {
+  id                    Int     @id @default(autoincrement())
+  student_id            Int
+  parent_id             Int
+  is_primary            Boolean @default(false)
+  receives_notifications Boolean @default(true)
+
+  student Student @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  parent  Parent  @relation(fields: [parent_id], references: [id], onDelete: Cascade)
+
+  @@unique([student_id, parent_id])
+  @@map("student_parents")
+}
+
+// ----------------------------------------------------
+// 5. STUDENT ENROLLMENT
+// ----------------------------------------------------
+
+model StudentEnrollment {
+  id               Int      @id @default(autoincrement())
+  student_id       Int
+  academic_year_id Int
+  class_id         Int
+  roll_number      String?  @db.VarChar(20)
+  enrollment_date  DateTime @default(now()) 
+  status           String   @default("ACTIVE") @db.VarChar(20)
+
+  student       Student      @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  academic_year AcademicYear @relation(fields: [academic_year_id], references: [id], onDelete: Cascade)
+  class         Class        @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  marks         Mark[]
+  fees          StudentFee[]
+
+  @@unique([student_id, academic_year_id])
+  @@index([class_id])
+  @@index([status])
+  @@map("student_enrollments")
+}
+
+// ----------------------------------------------------
+// 6. SUBJECTS & TEACHER ASSIGNMENTS
+// ----------------------------------------------------
+
+model Subject {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  code        String   @unique @db.VarChar(30)
+  description String?  @db.Text
+
+  standard_subjects StandardSubject[]
+  class_staff       ClassStaff[]
+  staff_subjects    StaffSubject[]
+  marks             Mark[]
+
+  @@map("subjects")
+}
+
+model StandardSubject {
+  id          Int     @id @default(autoincrement())
+  standard_id Int
+  subject_id  Int
+  is_optional Boolean @default(false)
+  max_marks   Decimal @default(100.00) @db.Decimal(5, 2)
+  pass_marks  Decimal @default(35.00) @db.Decimal(5, 2)
+
+  standard Standard @relation(fields: [standard_id], references: [id], onDelete: Cascade)
+  subject  Subject  @relation(fields: [subject_id], references: [id], onDelete: Cascade)
+
+  @@unique([standard_id, subject_id])
+  @@map("standard_subjects")
+}
+
+model ClassStaff {
+  id            Int       @id @default(autoincrement())
+  class_id      Int
+  staff_id      Int
+  subject_id    Int?
+  role          String    @default("SUBJECT_TEACHER") @db.VarChar(30)
+  assigned_from DateTime  @default(now()) 
+  assigned_to   DateTime? @db.Date
+
+  class   Class    @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  staff   Staff    @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subject_id], references: [id], onDelete: SetNull)
+
+  @@index([class_id, staff_id])
+  @@map("class_staff")
+}
+
+model StaffSubject {
+  id         Int @id @default(autoincrement())
+  staff_id   Int
+  subject_id Int
+
+  staff   Staff   @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subject_id], references: [id], onDelete: Cascade)
+
+  @@unique([staff_id, subject_id])
+  @@map("staff_subjects")
+}
+
+// ----------------------------------------------------
+// 7. EXAMINATIONS & MARKS
+// ----------------------------------------------------
+
+model Exam {
+  id               Int          @id @default(autoincrement())
+  academic_year_id Int
+  name             String       @db.VarChar(100)
+  exam_type        String       @db.VarChar(50)
+  start_date       DateTime     @db.Date
+  end_date         DateTime     @db.Date
+
+  academic_year AcademicYear @relation(fields: [academic_year_id], references: [id], onDelete: Cascade)
+  marks         Mark[]
+
+  @@map("exams")
+}
+
+model Mark {
+  id                    Int      @id @default(autoincrement())
+  student_enrollment_id Int
+  exam_id               Int
+  subject_id            Int
+  marks_obtained        Decimal  @db.Decimal(5, 2)
+  max_marks             Decimal  @default(100.00) @db.Decimal(5, 2)
+  grade                 String?  @db.VarChar(10)
+  remarks               String?  @db.VarChar(255)
+  entered_by            Int?
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  enrollment StudentEnrollment @relation(fields: [student_enrollment_id], references: [id], onDelete: Cascade)
+  exam       Exam              @relation(fields: [exam_id], references: [id], onDelete: Cascade)
+  subject    Subject           @relation(fields: [subject_id], references: [id], onDelete: Cascade)
+  entry_user User?             @relation("MarksEnteredBy", fields: [entered_by], references: [id], onDelete: SetNull)
+
+  @@unique([student_enrollment_id, exam_id, subject_id])
+  @@index([student_enrollment_id])
+  @@index([exam_id, subject_id])
+  @@map("marks")
+}
+
+// ----------------------------------------------------
+// 8. FEES & PAYMENTS
+// ----------------------------------------------------
+
+model FeeType {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique @db.VarChar(100)
+  description String?      @db.VarChar(255)
+  student_fees StudentFee[]
+
+  @@map("fee_types")
+}
+
+model StudentFee {
+  id                    Int          @id @default(autoincrement())
+  student_enrollment_id Int
+  fee_type_id           Int
+  amount                Decimal      @db.Decimal(10, 2)
+  due_date              DateTime     @db.Date
+  status                String       @default("PENDING") @db.VarChar(20)
+
+  enrollment StudentEnrollment @relation(fields: [student_enrollment_id], references: [id], onDelete: Cascade)
+  fee_type   FeeType           @relation(fields: [fee_type_id], references: [id], onDelete: Cascade)
+  payments   FeePayment[]
+
+  @@index([student_enrollment_id, status])
+  @@map("student_fees")
+}
+
+model FeePayment {
+  id                    Int        @id @default(autoincrement())
+  student_fee_id        Int
+  amount_paid           Decimal    @db.Decimal(10, 2)
+  payment_date          DateTime   @default(now())
+  payment_method        String     @db.VarChar(30)
+  transaction_reference String?    @db.VarChar(100)
+  received_by           Int?
+
+  student_fee StudentFee @relation(fields: [student_fee_id], references: [id], onDelete: Cascade)
+  receiver    User?      @relation("PaymentsReceivedBy", fields: [received_by], references: [id], onDelete: SetNull)
+
+  @@map("fee_payments")
+}
+
+// ----------------------------------------------------
+// 9. NOTIFICATIONS & LOGS
+// ----------------------------------------------------
+
+model Notification {
+  id         Int               @id @default(autoincrement())
+  student_id Int?
+  parent_id  Int?
+  type       String            @db.VarChar(50)
+  title      String            @db.VarChar(150)
+  message    String            @db.Text
+  status     String            @default("QUEUED") @db.VarChar(20)
+  sent_at    DateTime?         @default(now())
+  created_at DateTime          @default(now())
+
+  student Student?          @relation(fields: [student_id], references: [id], onDelete: SetNull)
+  parent  Parent?           @relation(fields: [parent_id], references: [id], onDelete: SetNull)
+  logs    NotificationLog[]
+
+  @@map("notifications")
+}
+
+model NotificationLog {
+  id                  Int      @id @default(autoincrement())
+  notification_id     Int
+  phone_number        String   @db.VarChar(25)
+  provider            String   @db.VarChar(50)
+  provider_message_id String?  @db.VarChar(150)
+  status              String   @db.VarChar(30)
+  error_message       String?  @db.Text
+  sent_at             DateTime @default(now())
+
+  notification Notification @relation(fields: [notification_id], references: [id], onDelete: Cascade)
+
+  @@map("notification_logs")
+}
+
+// ----------------------------------------------------
+// 10. AUDIT LOGS
+// ----------------------------------------------------
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  user_id     Int?
+  action      String   @db.VarChar(100)
+  entity_type String   @db.VarChar(60)
+  entity_id   Int?
+  old_data    Json?
+  new_data    Json?
+  ip_address  String?  @db.VarChar(45)
+  created_at  DateTime @default(now())
+
+  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([entity_type, entity_id])
+  @@index([created_at])
+  @@map("audit_logs")
+}

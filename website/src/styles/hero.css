@@ -1,0 +1,161 @@
+/* Cinematic Video Hero Styling */
+.hero-section {
+  position: relative;
+  min-height: 90vh;
+  min-height: 90dvh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #08162b;
+}
+
+/* Background Video */
+.hero-background-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.65;
+}
+
+/* Fallback Poster */
+.hero-fallback-poster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+/* Multi-stop Cinematic Overlay */
+.hero-gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(8, 22, 43, 0.95) 0%,
+    rgba(12, 35, 64, 0.85) 45%,
+    rgba(8, 22, 43, 0.7) 100%
+  );
+  z-index: 1;
+}
+
+/* Badge Pill */
+.hero-badge-pill {
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: var(--gold-bright);
+}
+
+.hero-logo-shield {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #08162b;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-family: var(--font-heading);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+}
+
+.hero-school-title {
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;
+}
+
+.hero-school-subtitle {
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Headline */
+.hero-headline {
+  font-size: 3.2rem;
+  line-height: 1.15;
+  letter-spacing: -1px;
+}
+
+.hero-pillars {
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.pillar-dot {
+  opacity: 0.6;
+}
+
+/* Glass Floating Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-btn {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all var(--transition-fast);
+}
+
+.glass-btn:hover {
+  background: rgba(245, 158, 11, 0.8);
+  color: #08162b !important;
+}
+
+/* Bottom Curve Divider */
+.hero-bottom-curve {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  line-height: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-bottom-curve svg {
+  display: block;
+  width: 100%;
+  height: 40px;
+}
+
+@media (max-width: 991.98px) {
+  .hero-headline {
+    font-size: 2.5rem;
+  }
+  .hero-section {
+    min-height: 80vh;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-headline {
+    font-size: 2rem;
+  }
+  .hero-school-title {
+    font-size: 1.2rem;
+  }
+  .hero-pillars {
+    font-size: 0.95rem;
+  }
+}

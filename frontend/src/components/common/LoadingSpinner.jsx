@@ -1,0 +1,16 @@
+import React from 'react';
+
+const LoadingSpinner = ({ message = 'Loading...', size = 'md', className = '' }) => {
+  const spinnerSize = size === 'sm' ? 'spinner-border-sm' : size === 'lg' ? 'style={{ width: "3rem", height: "3rem" }}' : '';
+
+  return (
+    <div className={`d-flex flex-column align-items-center justify-content-center py-5 ${className}`}>
+      <div className={`spinner-border text-primary ${size === 'sm' ? 'spinner-border-sm' : ''}`} role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+      {message && <p className="text-muted mt-3 mb-0 small fw-medium">{message}</p>}
+    </div>
+  );
+};
+
+export default LoadingSpinner;

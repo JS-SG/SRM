@@ -1,0 +1,22 @@
+{
+  "name": "srm-system",
+  "version": "1.0.0",
+  "description": "School Student Record Management System - Complete Full Stack Solution",
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "prisma:generate": "npm --prefix backend run prisma:generate",
+    "prisma:push": "npm --prefix backend run prisma:push",
+    "prisma:seed": "npm --prefix backend run prisma:seed"
+  },
+  "keywords": [
+    "school-management",
+    "student-records",
+    "prisma",
+    "mysql",
+    "react",
+    "bootstrap"
+  ],
+  "author": "Antigravity",
+  "license": "ISC"
+}

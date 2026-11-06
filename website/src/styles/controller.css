@@ -1,0 +1,69 @@
+/* Central Controller CMS Styles */
+
+.controller-app-shell {
+  font-family: var(--font-body);
+}
+
+.controller-sidebar {
+  width: 270px;
+  min-width: 270px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 1040;
+  transition: transform var(--transition-normal);
+}
+
+.sidebar-nav-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.sidebar-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+}
+
+.sidebar-nav-btn.active {
+  background: var(--gold-bright) !important;
+  color: #08162b !important;
+}
+
+.bg-white-10 {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.hover-white:hover {
+  color: #ffffff !important;
+}
+
+.metric-icon-box {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-login-wrapper {
+  background: radial-gradient(circle at top right, #0f2b5c, #08162b);
+}
+
+.admin-login-card {
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5) !important;
+}
+
+@media (max-width: 991.98px) {
+  .controller-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .controller-sidebar.show {
+    transform: translateX(0);
+  }
+}

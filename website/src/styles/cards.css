@@ -1,0 +1,100 @@
+/* Universal Card Component Styles */
+
+/* 1. Announcement Card */
+.announcement-card {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background: #ffffff;
+  transition: all var(--transition-normal);
+}
+
+.announcement-card:hover {
+  border-color: rgba(2, 132, 199, 0.3) !important;
+}
+
+/* 2. Event Card */
+.event-card {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background: #ffffff;
+  transition: all var(--transition-normal);
+}
+
+.event-card-img-wrap {
+  background: #0c2340;
+}
+
+.event-card:hover .event-img {
+  transform: scale(1.05);
+}
+
+.event-date-ribbon {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  min-width: 48px;
+}
+
+/* 3. Achievement Card */
+.achievement-card {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background: #ffffff;
+  transition: all var(--transition-normal);
+}
+
+.achievement-card:hover img {
+  transform: scale(1.05);
+}
+
+/* 4. Programme Card */
+.programme-card {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background: #ffffff;
+  transition: all var(--transition-normal);
+}
+
+.programme-card:hover .programme-img-wrap img {
+  transform: scale(1.05);
+}
+
+/* 5. Facility Card */
+.facility-card {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background: #ffffff;
+  transition: all var(--transition-normal);
+}
+
+.facility-card:hover .facility-img-wrap img {
+  transform: scale(1.05);
+}
+
+/* 6. Testimonial Card */
+.testimonial-card {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  background: #ffffff;
+  transition: all var(--transition-normal);
+}
+
+.quote-watermark {
+  pointer-events: none;
+}
+
+/* 7. Feature Pill Card */
+.feature-pill-card {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  transition: all var(--transition-normal);
+}
+
+.feature-icon-wrapper {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Group Arrow Microinteraction */
+.group-hover-arrow svg {
+  transition: transform 0.2s ease;
+}
+
+.cursor-pointer:hover .group-hover-arrow svg {
+  transform: translateX(4px);
+}
